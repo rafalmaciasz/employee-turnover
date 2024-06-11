@@ -10,7 +10,7 @@ data {
 generated quantities {
     real <lower=0> lambda = normal_rng(mu_lambda, sigma_lambda);
     real <lower=0> k = normal_rng(mu_k, sigma_k);
-    array [N] real y_sim; // survival times
+    array [N] real y_sim; // simulated survival times
     for (n in 1:N) {
         y_sim[n] = weibull_rng(k, lambda);
     }
