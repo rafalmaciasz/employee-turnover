@@ -7,27 +7,23 @@ data {
 
     real <lower=0> mu_k;          // mean for k
     real <lower=0> sigma_k;       // std for k
-    real <lower=0> mu_lambda;     // mean for lambda
-    real <lower=0> sigma_lambda;  // std for lambda
     real <lower=0> mu_theta;      // mean for theta
     real <lower=0> sigma_theta;   // std for theta
 }
 
 parameters {
-  real<lower=0> k;              // shape parameter
-  real<lower=0> lambda;         // scale parameter
-  vector <lower=0> [M] theta;   // regression coefficient
+    real<lower=0> k;              // shape parameter
+    vector <lower=0> [M] theta;   // regression coefficient
 }
 
 model {
     k ~ lognormal(mu_k, sigma_k);
-    lambda ~ lognormal(mu_lambda, sigma_lambda);
     theta ~ lognormal(mu_theta, sigma_theta);
     for (n in 1:N) {
         if (censor[n] == 0) {
-            target += weibull_lpdf(y[n] | exp(X[n] * theta) * k, lambda);
+            target += weibull_lpdf(y[n] | k, exp(X[n] * theta));
         } else {
-            target += weibull_lccdf(y[n] | exp(X[n] * theta) * k, lambda);
+            target += weibull_lccdf(y[n] | k, exp(X[n] * theta));
         }
     }
 }
@@ -36,7 +32,11 @@ generated quantities {
     array [N] real y_sim;   // survival times
     vector[N] log_lik;      // likelihood
     for (n in 1:N) {
-        log_lik[n] = weibull_lpdf(y[n] | exp(X[n] * theta) * k, lambda);
-        y_sim[n] = weibull_rng(exp(X[n] * theta) * k, lambda);
+        if (censor[n] == 0) {
+            log_lik[n] = weibull_lpdf(y[n] | k, exp(X[n] * theta));
+        } else {
+            log_lik[n] = weibull_lccdf(y[n] | k, exp(X[n] * theta));
+        }
+        y_sim[n] = weibull_rng(k, exp(X[n] * theta));
     }
 }

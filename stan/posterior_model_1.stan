@@ -1,7 +1,5 @@
 data {
     int <lower=0> N; // number of observations
-    int <lower=0> M; // number of features
-    matrix [N, M] X; // covariates matrix
     vector[N] y;     // survival times
     array[N] int <lower=0,upper=1> censor;  //censoring indicator
 
@@ -12,8 +10,8 @@ data {
 }
 
 parameters {
-  vector <lower=0> [M] k;   // shape parameter
-  real<lower=0> lambda;     // scale parameter
+    real <lower=0> k;       // shape parameter
+    real <lower=0> lambda;  // scale parameter
 }
 
 model {
@@ -21,9 +19,9 @@ model {
     lambda ~ lognormal(mu_lambda, sigma_lambda);
     for (n in 1:N) {
         if (censor[n] == 0) {
-            target += weibull_lpdf(y[n] | exp(X[n] * k), lambda);
+            target += weibull_lpdf(y[n] | k, lambda);
         } else {
-            target += weibull_lccdf(y[n] | exp(X[n] * k), lambda);
+            target += weibull_lccdf(y[n] | k, lambda);
         }
     }
 }
@@ -32,7 +30,11 @@ generated quantities {
     array [N] real y_sim;   // survival times
     vector[N] log_lik;      // likelihood
     for (n in 1:N) {
-        log_lik[n] = weibull_lpdf(y[n] | exp(X[n] * k), lambda);
-        y_sim[n] = weibull_rng(exp(X[n] * k), lambda);
+        if (censor[n] == 0) {
+            log_lik[n] = weibull_lpdf(y[n] | k, lambda);
+        } else {
+            log_lik[n] = weibull_lccdf(y[n] | k, lambda);
+        }
+        y_sim[n] = weibull_rng(k, lambda);
     }
 }
