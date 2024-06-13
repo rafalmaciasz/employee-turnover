@@ -1,6 +1,6 @@
 data {
     int <lower=0> N; // number of observations
-    vector[N] y;     // survival times
+    vector <lower=0,upper=180> [N] y;       // survival times
     array[N] int <lower=0,upper=1> censor;  //censoring indicator
 
     real <lower=0> mu_k;          // mean for k

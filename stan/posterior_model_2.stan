@@ -1,8 +1,8 @@
 data {
     int <lower=0> N; // number of observations
     int <lower=0> M; // number of features
-    matrix [N, M] X; // covariates matrix
-    vector[N] y;     // survival times
+    matrix <lower=0,upper=1> [N, M] X;      // covariates matrix
+    vector <lower=0,upper=180> [N] y;       // survival times
     array[N] int <lower=0,upper=1> censor;  //censoring indicator
 
     real <lower=0> mu_k;          // mean for k
