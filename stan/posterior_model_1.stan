@@ -10,8 +10,8 @@ data {
 }
 
 parameters {
-    real <lower=0> k;       // shape parameter
-    real <lower=0> lambda;  // scale parameter
+    real <lower=0.1,upper=10> k;       // shape parameter
+    real <lower=0.1,upper=100> lambda;  // scale parameter
 }
 
 model {

@@ -12,8 +12,8 @@ data {
 }
 
 parameters {
-    real<lower=0> k;              // shape parameter
-    vector <lower=0> [M] theta;   // regression coefficient
+    real <lower=0.1,upper=100> k;              // shape parameter
+    vector <lower=0.001,upper=2> [M] theta;   // regression coefficient
 }
 
 model {
